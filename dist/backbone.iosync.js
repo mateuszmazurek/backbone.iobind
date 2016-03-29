@@ -30,6 +30,10 @@
 
 var ajaxSync = Backbone.sync;
 
+var getSocket = function(model) {
+  return model.socket || Backbone.socket || window.socket;
+}
+
 /**
  * # Backbone.sync
  *
@@ -73,7 +77,7 @@ var socketSync = function (method, model, options) {
   }
 
   // If your socket.io connection exists on a different var, change here:
-  var io = model.socket || Backbone.socket || window.socket
+  var io = getSocket(model);
 
   //since Backbone version 1.0.0 all events are raised in methods 'fetch', 'save', 'remove' etc
 
@@ -93,11 +97,11 @@ var socketSync = function (method, model, options) {
 };
 
 var getSyncMethod = function(model) {
-  if (_.result(model.ajaxSync)) {
-    return ajaxSync;
+  if (getSocket(model)) {
+    return socketSync;
   }
 
-  return socketSync;
+  return ajaxSync;
 };
 
 // Override 'Backbone.sync' to default to socketSync,
